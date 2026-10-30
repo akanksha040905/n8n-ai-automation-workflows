@@ -14,16 +14,16 @@ Four AI-powered automation workflows built with n8n, Google Gemini and Google Wo
 ## Screenshots
 
 ### 1. Lead Generation Agent
-![Lead Generation Agent](screenshots/01-lead-generation.png)
+![Lead Generation Agent](02-lead-generation.png)
 
 ### 2. CV Screening
-![CV Screening](screenshots/02-cv-screening.png)
+![CV Screening](03-cv-screening.png)
 
 ### 3. AI Personal Assistant
-![AI Personal Assistant](screenshots/03-ai-personal-assistant.png)
+![AI Personal Assistant](04-ai-personal-assistant.png)
 
 ### 4. LinkedIn Auto Poster
-![LinkedIn Auto Poster](screenshots/04-linkedin-auto-poster.png)
+![LinkedIn Auto Poster](05-linkedin-auto-poster.png)
 
 ## How to use
 1. Open n8n and create a new workflow.
