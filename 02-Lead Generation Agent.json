@@ -1,0 +1,301 @@
+{
+  "name": "02-Lead Generation Agent",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e8be32a3-b1bc-4d18-80be-a30e331f9792",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1DG15iOy7zvTej8z4Ga-li_ggoQqhDy-SH3SkUpwYhYc",
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DG15iOy7zvTej8z4Ga-li_ggoQqhDy-SH3SkUpwYhYc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DG15iOy7zvTej8z4Ga-li_ggoQqhDy-SH3SkUpwYhYc/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "a8e3834a-1979-4576-b463-9c71116ab933",
+      "name": "Get Leads",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "c8KKeTPOYRvnWZDJ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "maxItems": 5
+      },
+      "id": "a500fdd6-4f57-4336-8c29-c59e1700fec3",
+      "name": "Limit",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        448,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a sales assistant. We sell online ordering and billing software for small restaurants in India. Our ideal customer is an independent restaurant with a website. Lead data: Company: {{ $json.company }}, Website: {{ $json.website }}, Notes: {{ $json.notes }}. Score how well this business fits from 0 to 100, explain why in one sentence, and write a short friendly 2-sentence outreach message addressed to the business. If a detail is missing write Not found. Do not invent phone numbers or emails.",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "id": "c69d26bf-bab2-4cf3-bdb2-7b3391bb2a86",
+      "name": "Qualify Lead",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        672,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-flash-latest",
+        "options": {}
+      },
+      "id": "0d07b89a-f3d3-4c61-9b6b-f9fb9f6407a9",
+      "name": "Google Gemini Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        688,
+        336
+      ],
+      "credentials": {
+        "googlePalmApi": {
+          "id": "N723h4Mr9H4agsp7",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\"company\":\"Business name\",\"website\":\"https://example.com\",\"phone\":\"Not found\",\"email\":\"Not found\",\"score\":80,\"fit_reason\":\"One sentence.\",\"outreach_message\":\"Two friendly sentences.\"}"
+      },
+      "id": "bd48d87f-e06a-42dd-9c31-6b56e8b75eab",
+      "name": "Structured Output Parser",
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        864,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "1DG15iOy7zvTej8z4Ga-li_ggoQqhDy-SH3SkUpwYhYc",
+          "cachedResultName": "Leads"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Sheet1"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "company": "={{ $json.output.company }}",
+            "website": "={{ $json.output.website }}",
+            "phone": "={{ $json.output.phone }}",
+            "email": "={{ $json.output.email }}",
+            "score": "={{ $json.output.score }}",
+            "fit_reason": "={{ $json.output.fit_reason }}",
+            "outreach_message": "={{ $json.output.outreach_message }}"
+          },
+          "schema": [
+            {
+              "id": "company",
+              "displayName": "company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "fit_reason",
+              "displayName": "fit_reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "outreach_message",
+              "displayName": "outreach_message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "95281468-2728-4fc4-8beb-fbebb6572879",
+      "name": "Save Result",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1024,
+        112
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "c8KKeTPOYRvnWZDJ",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Leads": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Qualify Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualify Lead": {
+      "main": [
+        [
+          {
+            "node": "Save Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Qualify Lead",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Qualify Lead",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "0add8831-019e-46a4-8208-e0123b4a73eb",
+  "meta": {
+    "instanceId": "bfc726e5ee7a9ab4c2c181e1532c29395b028193f8c2c8bece811b6bbd6f0f21"
+  },
+  "nodeGroups": [],
+  "id": "IrHZmIgYcQe8xORt",
+  "tags": []
+}
